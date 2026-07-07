@@ -1,48 +1,95 @@
 # Marketly
 
-Marketly est une marketplace multi-vendeurs realisee pour le Bloc 02 RNCP du M2 Expert Developpement Full Stack Ynov. Le projet couvre la conception, le developpement, la securisation, les tests, la documentation et l'orchestration Docker d'une application complete buyer / seller / admin.
+Marketly is a multi-vendor marketplace built for the Bloc 02 RNCP evaluation in the Ynov M2 Expert Developpement Full Stack program.
 
-## Stack
+The project includes:
 
-- Frontend: Next.js 14 + TypeScript + Tailwind CSS
-- Backend: Node.js + Express + TypeScript
-- Base de donnees: PostgreSQL + Prisma ORM
-- Authentification: JWT + bcrypt
-- Paiement: Stripe Checkout en mode test
-- Tests: Jest + Supertest
-- Documentation API: Swagger/OpenAPI sur `/api/docs`
-- Conteneurisation: `docker-compose.yml`
+- a `Next.js` frontend for buyers, sellers, and admins
+- an `Express` API with `TypeScript`
+- a `PostgreSQL` database with `Prisma`
+- `JWT` authentication and role-based access control
+- `Stripe` test checkout and webhook handling
+- automated tests with `Jest` and `Supertest`
+- API documentation with `Swagger`
+- local orchestration with `Docker Compose`
 
-## Structure
+## Tech Stack
+
+- Frontend: `Next.js 14`, `TypeScript`, `Tailwind CSS`
+- Backend: `Node.js`, `Express`, `TypeScript`
+- Database: `PostgreSQL`, `Prisma ORM`
+- Auth: `JWT`, `bcrypt`
+- Payments: `Stripe Checkout` in test mode
+- Testing: `Jest`, `Supertest`
+- API docs: `Swagger/OpenAPI`
+- Containers: `Docker Compose`
+
+## Features
+
+- User registration and login
+- Roles: `BUYER`, `SELLER`, `ADMIN`
+- User profile, addresses, and order history
+- Seller shop creation and management
+- Product CRUD, categories, images, price, and stock
+- Product search and filtering
+- Persistent cart per user
+- Multi-shop order creation
+- Stripe checkout session creation
+- Stripe webhook payment update
+- Admin dashboard and moderation
+- Rate limiting, `helmet`, validation, centralized error handling
+- Seed data for demo accounts and catalog
+
+## Project Structure
 
 ```text
 marketly/
-├── backend/
-├── frontend/
-├── docker-compose.yml
-├── README.md
-├── docs/
-│   ├── rapport-bloc-02.md
-│   ├── architecture.md
-│   ├── api.md
-│   ├── database.md
-│   ├── postman/
-│   │   └── Marketly.postman_collection.json
-│   └── screenshots/
-│       └── README.md
+|-- backend/
+|-- frontend/
+|-- docs/
+|   |-- architecture.md
+|   |-- api.md
+|   |-- database.md
+|   |-- rapport-bloc-02.md
+|   `-- postman/
+|-- docker-compose.yml
+`-- README.md
 ```
 
-## Comptes seed
+## Demo Accounts
 
 - Admin: `admin@marketly.dev` / `Admin123!`
 - Seller: `seller@marketly.dev` / `Seller123!`
 - Buyer: `buyer@marketly.dev` / `Buyer123!`
 
-## Variables d'environnement
+## Quick Start With Docker
 
-### Racine
+### 1. Create env files
 
-Fichier: `.env`
+```powershell
+Copy-Item .env.example .env
+Copy-Item backend\.env.example backend\.env
+Copy-Item frontend\.env.example frontend\.env.local
+```
+
+### 2. Build and start the full stack
+
+```powershell
+docker compose up --build
+```
+
+### 3. Open the app
+
+- Frontend: `http://localhost:3000`
+- Backend API: `http://localhost:4000/api`
+- Swagger: `http://localhost:4000/api/docs`
+- Healthcheck: `http://localhost:4000/health`
+
+## Local Development
+
+### Root env
+
+File: `.env`
 
 ```env
 POSTGRES_DB=marketly
@@ -57,9 +104,9 @@ RATE_LIMIT_WINDOW_MS=60000
 RATE_LIMIT_MAX=100
 ```
 
-### Backend
+### Backend env
 
-Fichier: `backend/.env`
+File: `backend/.env`
 
 ```env
 NODE_ENV=development
@@ -75,35 +122,21 @@ RATE_LIMIT_WINDOW_MS=60000
 RATE_LIMIT_MAX=100
 ```
 
-### Frontend
+### Frontend env
 
-Fichier: `frontend/.env.local`
+File: `frontend/.env.local`
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:4000/api
 ```
 
-## Installation locale
-
-### 1. Preparer les fichiers `.env`
-
-PowerShell:
-
-```powershell
-Copy-Item .env.example .env
-Copy-Item backend\.env.example backend\.env
-Copy-Item frontend\.env.example frontend\.env.local
-```
-
-### 2. Lancer PostgreSQL
-
-Option simple avec Docker:
+### Start PostgreSQL only
 
 ```powershell
 docker compose up -d postgres
 ```
 
-### 3. Installer et lancer le backend
+### Start backend locally
 
 ```powershell
 Set-Location backend
@@ -114,15 +147,7 @@ npm run seed
 npm run dev
 ```
 
-Le backend sera disponible sur:
-
-- API: `http://localhost:4000/api`
-- Healthcheck: `http://localhost:4000/health`
-- Swagger: `http://localhost:4000/api/docs`
-
-### 4. Installer et lancer le frontend
-
-Dans un second terminal:
+### Start frontend locally
 
 ```powershell
 Set-Location frontend
@@ -130,36 +155,7 @@ npm install
 npm run dev
 ```
 
-Le frontend sera disponible sur:
-
-- Application: `http://localhost:3000`
-
-## Lancement Docker Compose
-
-Depuis la racine:
-
-```powershell
-Copy-Item .env.example .env
-docker compose up --build
-```
-
-Services exposes:
-
-- Frontend: `http://localhost:3000`
-- Backend: `http://localhost:4000`
-- PostgreSQL: `localhost:5432`
-
-## Stripe test
-
-Pour tester le webhook Stripe localement:
-
-```powershell
-stripe listen --forward-to localhost:4000/api/payments/webhook
-```
-
-Puis mettre a jour `STRIPE_WEBHOOK_SECRET` dans `backend/.env`.
-
-## Scripts utiles
+## Useful Commands
 
 ### Backend
 
@@ -181,55 +177,50 @@ npm run build
 npm run start
 ```
 
-## Tests
+## Stripe Test Webhook
 
-La suite automatisee contient 19 tests Supertest/Jest couvrant:
+```powershell
+stripe listen --forward-to localhost:4000/api/payments/webhook
+```
 
-- Authentification
-- Produits
-- Commandes
-- Administration
+Then update `STRIPE_WEBHOOK_SECRET` in `backend/.env`.
 
-Commande:
+## Automated Tests
+
+The backend test suite currently includes `19` automated tests covering:
+
+- authentication
+- products
+- orders
+- admin flows
+
+Run:
 
 ```powershell
 Set-Location backend
 npm test
 ```
 
-## Fonctionnalites couvertes
-
-- Authentification JWT avec roles `BUYER`, `SELLER`, `ADMIN`
-- Profil utilisateur, adresses, historique des commandes
-- Creation et mise a jour de boutique vendeur
-- CRUD produits cote API
-- Recherche, filtres, prix, stock, images produits
-- Panier persistant par utilisateur
-- Creation de commandes par boutique
-- Session Stripe Checkout et webhook
-- Dashboard admin avec moderation boutiques / produits
-- Middlewares `helmet`, rate limiting, validation Zod, gestion centralisee des erreurs
-- Swagger/OpenAPI
-- Seed data
-
 ## Documentation
 
 - Architecture: [docs/architecture.md](docs/architecture.md)
 - API: [docs/api.md](docs/api.md)
-- Base de donnees: [docs/database.md](docs/database.md)
-- Rapport Bloc 02: [docs/rapport-bloc-02.md](docs/rapport-bloc-02.md)
-- Collection Postman: [docs/postman/Marketly.postman_collection.json](docs/postman/Marketly.postman_collection.json)
+- Database: [docs/database.md](docs/database.md)
+- Bloc 02 report: [docs/rapport-bloc-02.md](docs/rapport-bloc-02.md)
+- Postman collection: [docs/postman/Marketly.postman_collection.json](docs/postman/Marketly.postman_collection.json)
 
-## Verification realisee
+## Validation Already Performed
 
-- Backend: `npm run build`
-- Backend: `npm test`
-- Frontend: `npm run build`
+- Backend build: `npm run build`
+- Backend tests: `npm test`
+- Frontend build: `npm run build`
+- Docker image build: `docker compose build backend frontend`
 
-## Pistes d'amelioration
+## Possible Improvements
 
-- Gestion avancée des images via upload S3/Cloudinary
-- Notifications email post-commande
-- Back-office analytics avec graphiques
-- Pagination et tri avance du catalogue
-- Refresh token et rotation de session
+- cloud image upload with S3 or Cloudinary
+- email notifications after order creation
+- analytics dashboard with charts
+- pagination and advanced sorting
+- refresh tokens and session rotation
+- production deployment pipeline
