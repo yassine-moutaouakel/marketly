@@ -70,8 +70,11 @@ PostgreSQL
 - Middlewares `authenticate` et `authorize`
 - Validation Zod sur les corps de requete
 - `helmet` pour les entetes HTTP
-- `express-rate-limit` pour limiter les abus
+- `express-rate-limit` global, complete par un limiteur strict sur `/auth/*`
 - Gestion centralisee des erreurs
+- Garde de concurrence sur le stock au checkout (`updateMany` conditionnel)
+- Refus de demarrage en production avec des secrets par defaut
+- Verification de signature des webhooks Stripe
 
 ## Flux metier principal
 
@@ -104,6 +107,21 @@ PostgreSQL
 - `postgres`: base de donnees
 - `backend`: API avec `prisma db push` et `seed`
 - `frontend`: build Next.js production
+
+## Integration continue
+
+Le pipeline `.github/workflows/ci.yml` enchaine trois jobs :
+
+1. `backend` : `npm ci`, `prisma generate`, `prisma migrate deploy` sur un
+   service PostgreSQL, `npm run build` puis `npm test -- --coverage`.
+2. `frontend` : `npm ci` puis `next build`.
+3. `docker` : construction des images backend et frontend.
+
+## Migrations de base de donnees
+
+Le schema est versionne dans `backend/prisma/migrations`. Le conteneur backend
+execute `prisma migrate deploy` au demarrage, garantissant un historique de
+schema reproductible entre les environnements.
 
 ## Choix d'architecture
 

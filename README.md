@@ -9,9 +9,11 @@ The project includes:
 - a `PostgreSQL` database with `Prisma`
 - `JWT` authentication and role-based access control
 - `Stripe` test checkout and webhook handling
-- automated tests with `Jest` and `Supertest`
+- automated tests with `Jest` and `Supertest` (37 tests, 81% statement coverage)
 - API documentation with `Swagger`
 - local orchestration with `Docker Compose`
+- versioned database migrations with `Prisma Migrate`
+- continuous integration with `GitHub Actions`
 
 ## Tech Stack
 
@@ -37,7 +39,9 @@ The project includes:
 - Stripe checkout session creation
 - Stripe webhook payment update
 - Admin dashboard and moderation
-- Rate limiting, `helmet`, validation, centralized error handling
+- Server-side pagination on the catalogue (`page`, `limit`, `meta`)
+- Rate limiting (global + strict limiter on auth routes), `helmet`, validation, centralized error handling
+- Accessibility: form labels, ARIA attributes, skip link, keyboard navigation
 - Seed data for demo accounts and catalog
 
 ## Project Structure
@@ -46,6 +50,9 @@ The project includes:
 marketly/
 |-- backend/
 |-- frontend/
+|-- .github/
+|   `-- workflows/
+|       `-- ci.yml
 |-- docs/
 |   |-- architecture.md
 |   |-- api.md
@@ -53,6 +60,7 @@ marketly/
 |   |-- rapport-bloc-02.md
 |   `-- postman/
 |-- docker-compose.yml
+|-- CHANGELOG.md
 `-- README.md
 ```
 
@@ -142,7 +150,7 @@ docker compose up -d postgres
 Set-Location backend
 npm install
 npx prisma generate
-npx prisma db push
+npx prisma migrate deploy
 npm run seed
 npm run dev
 ```
@@ -216,11 +224,34 @@ npm test
 - Frontend build: `npm run build`
 - Docker image build: `docker compose build backend frontend`
 
+## Continuous Integration
+
+Every push and pull request on `main`, `master` or `develop` triggers
+`.github/workflows/ci.yml`:
+
+1. **backend** - installs dependencies, generates the Prisma client, applies
+   migrations on a PostgreSQL service container, compiles TypeScript and runs
+   the full test suite with coverage (archived as a build artifact).
+2. **frontend** - installs dependencies and builds the production bundle.
+3. **docker** - builds both container images once the two previous jobs pass.
+
+## Database Migrations
+
+The schema is versioned in `backend/prisma/migrations`.
+
+- create a migration during development: `npm run prisma:migrate`
+- apply pending migrations (CI, Docker, production): `npx prisma migrate deploy`
+
+An existing database created with `prisma db push` has no migration history and
+must be baselined once with
+`npx prisma migrate resolve --applied <migration_name>` before `migrate deploy`
+can run against it.
+
 ## Possible Improvements
 
 - cloud image upload with S3 or Cloudinary
 - email notifications after order creation
 - analytics dashboard with charts
-- pagination and advanced sorting
+- advanced sorting and faceted filters
 - refresh tokens and session rotation
 - production deployment pipeline

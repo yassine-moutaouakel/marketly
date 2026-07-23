@@ -82,6 +82,25 @@ erDiagram
 - `Order.shopId`
 - `Address.userId`
 
+## Migrations
+
+Le schema est versionne avec Prisma Migrate dans `backend/prisma/migrations`.
+
+- developpement : `npm run prisma:migrate` (cree et applique une migration)
+- CI / Docker / production : `npx prisma migrate deploy`
+
+Une base creee historiquement avec `prisma db push` ne possede pas de table
+`_prisma_migrations` et doit etre baselinee une fois avec
+`npx prisma migrate resolve --applied <nom_migration>`.
+
+## Integrite et concurrence
+
+Le decrement de stock au checkout est protege par une garde conditionnelle
+(`updateMany` avec `stock >= quantite`), executee dans la transaction de
+creation des commandes. Si aucune ligne ne correspond, la transaction est
+annulee et l'API renvoie `409 Insufficient stock` : deux checkouts simultanes
+ne peuvent pas faire passer le stock en negatif.
+
 ## Seed data livrees
 
 - 1 admin
@@ -89,5 +108,5 @@ erDiagram
 - 1 buyer
 - 3 categories
 - 1 boutique approuvee
-- 3 produits publies
+- 16 produits publies repartis sur les trois categories
 - 1 adresse buyer par defaut
