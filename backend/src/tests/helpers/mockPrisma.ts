@@ -37,6 +37,7 @@ export const mockPrisma = {
     findMany: createMockFunction(),
     create: createMockFunction(),
     update: createMockFunction(),
+    updateMany: createMockFunction(),
     delete: createMockFunction(),
     count: createMockFunction(),
     upsert: createMockFunction()

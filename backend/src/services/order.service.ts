@@ -120,9 +120,15 @@ export const orderService = {
         });
 
         for (const item of items) {
-          await transaction.product.update({
+          // Guarded decrement: the WHERE clause enforces stock >= quantity at
+          // database level, which protects against concurrent checkouts that
+          // would otherwise drive the stock below zero (race condition).
+          const stockUpdate = await transaction.product.updateMany({
             where: {
-              id: item.product.id
+              id: item.product.id,
+              stock: {
+                gte: item.quantity
+              }
             },
             data: {
               stock: {
@@ -130,6 +136,10 @@ export const orderService = {
               }
             }
           });
+
+          if (stockUpdate.count === 0) {
+            throw new ApiError(409, `Insufficient stock for product "${item.product.name}"`);
+          }
         }
 
         orders.push(order);

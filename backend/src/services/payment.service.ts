@@ -77,11 +77,13 @@ export const paymentService = {
       throw new ApiError(400, "Missing Stripe signature");
     }
 
-    const event = stripe.webhooks.constructEvent(
-      payload,
-      signature,
-      env.STRIPE_WEBHOOK_SECRET
-    );
+    let event: Stripe.Event;
+
+    try {
+      event = stripe.webhooks.constructEvent(payload, signature, env.STRIPE_WEBHOOK_SECRET);
+    } catch {
+      throw new ApiError(400, "Invalid Stripe webhook signature");
+    }
 
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;

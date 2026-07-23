@@ -62,7 +62,7 @@ describe("Order routes", () => {
       ]
     });
     mockPrisma.order.create.mockResolvedValue(createdOrder);
-    mockPrisma.product.update.mockResolvedValue(product);
+    mockPrisma.product.updateMany.mockResolvedValue({ count: 1 });
     mockPrisma.cartItem.deleteMany.mockResolvedValue({ count: 1 });
 
     const response = await request(app)
@@ -76,7 +76,50 @@ describe("Order routes", () => {
     expect(response.status).toBe(201);
     expect(response.body.data).toHaveLength(1);
     expect(mockPrisma.order.create).toHaveBeenCalled();
-    expect(mockPrisma.product.update).toHaveBeenCalled();
+    expect(mockPrisma.product.updateMany).toHaveBeenCalled();
+  });
+
+  it("rejects checkout when the stock became insufficient (concurrency guard)", async () => {
+    const buyer = buildUser({ id: "buyer-1" });
+    const shop = buildShop({ ownerId: "seller-1" });
+    const product = buildProduct({ id: "product-1", stock: 1 }, { shop });
+
+    mockPrisma.user.findUnique.mockResolvedValue({
+      ...buyer,
+      addresses: [buildAddress({ userId: buyer.id })]
+    });
+    mockPrisma.cart.findUnique.mockResolvedValue({
+      id: "cart-1",
+      userId: buyer.id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      items: [
+        {
+          id: "cart-item-1",
+          cartId: "cart-1",
+          productId: product.id,
+          quantity: 1,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          product
+        }
+      ]
+    });
+    mockPrisma.order.create.mockResolvedValue(
+      buildOrder({ buyerId: buyer.id, shopId: shop.id }, { buyer, shop })
+    );
+    // Simulates a concurrent checkout that consumed the last unit first:
+    // the guarded updateMany matches no row.
+    mockPrisma.product.updateMany.mockResolvedValue({ count: 0 });
+
+    const response = await request(app)
+      .post("/api/orders/checkout")
+      .set("Authorization", authHeaderForRole("BUYER", { id: buyer.id }))
+      .send({ addressId: "address-1" });
+
+    expect(response.status).toBe(409);
+    expect(response.body.message).toMatch(/stock/i);
+    expect(mockPrisma.cartItem.deleteMany).not.toHaveBeenCalled();
   });
 
   it("rejects checkout when the cart is empty", async () => {
