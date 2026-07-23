@@ -57,6 +57,8 @@ backend/prisma/*.db-journal
 Thumbs.db
 .idea/
 .vscode/
+.claude/
+*.tsbuildinfo
 
 # Legacy workspace artifacts not part of the final deliverable
 back/
