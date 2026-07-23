@@ -4,6 +4,18 @@ Toutes les evolutions notables du projet Marketly sont consignees dans ce fichie
 Le format suit les principes de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/)
 et le projet applique le [versionnage semantique](https://semver.org/lang/fr/).
 
+## [1.1.1] - 2026-07-24
+
+### Corrections
+
+- Le script `start` du backend pointait vers `dist/server.js`, alors que
+  `tsconfig.json` (`rootDir: "."`, necessaire pour typechecker
+  `prisma/seed.ts` via `npm run build`) emet la sortie compilee dans
+  `dist/src/`. Le conteneur backend crashait au demarrage
+  (`MODULE_NOT_FOUND`) sans que le pipeline CI ne le detecte, le job
+  `docker` se contentant de construire l'image sans la demarrer. Repere
+  et corrige lors d'un `docker compose up --build` complet.
+
 ## [1.1.0] - 2026-07-23
 
 ### Securite
