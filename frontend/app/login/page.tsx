@@ -45,22 +45,52 @@ export default function LoginPage() {
           <p>Admin: `admin@marketly.dev / Admin123!`</p>
         </div>
 
-        <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
-          <input
-            className="field"
-            type="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
-          />
-          <input
-            className="field"
-            type="password"
-            placeholder="Mot de passe"
-            value={form.password}
-            onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
-          />
-          {error ? <p className="text-sm text-ember">{error}</p> : null}
+        <form className="mt-8 space-y-4" onSubmit={handleSubmit} noValidate>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-ink" htmlFor="login-email">
+              Adresse email
+            </label>
+            <input
+              id="login-email"
+              name="email"
+              className="field"
+              type="email"
+              autoComplete="email"
+              required
+              aria-required="true"
+              aria-invalid={error ? true : undefined}
+              aria-describedby={error ? "login-error" : undefined}
+              placeholder="Email"
+              value={form.email}
+              onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-ink" htmlFor="login-password">
+              Mot de passe
+            </label>
+            <input
+              id="login-password"
+              name="password"
+              className="field"
+              type="password"
+              autoComplete="current-password"
+              required
+              aria-required="true"
+              aria-invalid={error ? true : undefined}
+              aria-describedby={error ? "login-error" : undefined}
+              placeholder="Mot de passe"
+              value={form.password}
+              onChange={(event) =>
+                setForm((current) => ({ ...current, password: event.target.value }))
+              }
+            />
+          </div>
+          {error ? (
+            <p id="login-error" role="alert" className="text-sm text-ember">
+              {error}
+            </p>
+          ) : null}
           <button type="submit" className="primary-button" disabled={loading}>
             {loading ? "Connexion..." : "Se connecter"}
           </button>
