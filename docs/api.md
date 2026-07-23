@@ -24,7 +24,7 @@ Authorization: Bearer <jwt>
 | Addresses | POST | `/addresses` | JWT | Ajouter une adresse |
 | Shops | POST | `/shops` | Seller/Admin | Creer une boutique |
 | Shops | PUT | `/shops/me` | Seller/Admin | Modifier sa boutique |
-| Products | GET | `/products` | Public | Catalogue + filtres |
+| Products | GET | `/products` | Public | Catalogue + filtres + pagination |
 | Products | POST | `/products` | Seller/Admin | Creer un produit |
 | Products | GET | `/products/seller/mine` | Seller/Admin | Produits du vendeur |
 | Cart | POST | `/cart/items` | JWT | Ajouter au panier |
@@ -68,8 +68,24 @@ Content-Type: application/json
 ### Recherche produit
 
 ```http
-GET /api/products?search=casque&minPrice=50&maxPrice=120
+GET /api/products?search=casque&minPrice=50&maxPrice=120&page=1&limit=12
 ```
+
+Reponse paginee :
+
+```json
+{
+  "data": [{ "id": "...", "name": "Casque Bluetooth Nova", "price": 89.9 }],
+  "meta": { "page": 1, "limit": 12, "total": 16, "totalPages": 2 }
+}
+```
+
+Parametres de pagination :
+
+- `page` : numero de page, entier positif, defaut `1`
+- `limit` : taille de page, entier entre `1` et `50`, defaut `12`
+
+Une valeur hors bornes renvoie une erreur `400` de validation.
 
 ### Ajout panier
 

@@ -4,7 +4,7 @@ import { useDeferredValue, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ProductCard } from "@/components/ProductCard";
 import { SectionTitle } from "@/components/SectionTitle";
-import { api } from "@/lib/api";
+import { api, type PaginationMeta } from "@/lib/api";
 import type { Category, Product } from "@/lib/types";
 import { useAuth } from "@/components/AuthProvider";
 
@@ -17,6 +17,8 @@ export default function HomePage() {
   const [categoryId, setCategoryId] = useState("");
   const [priceMin, setPriceMin] = useState("");
   const [priceMax, setPriceMax] = useState("");
+  const [page, setPage] = useState(1);
+  const [meta, setMeta] = useState<PaginationMeta | undefined>();
   const [loading, setLoading] = useState(true);
   const [feedback, setFeedback] = useState("");
   const deferredSearch = useDeferredValue(search);
@@ -28,7 +30,8 @@ export default function HomePage() {
         api.getCategories()
       ]);
 
-      setProducts(productsData);
+      setProducts(productsData.data);
+      setMeta(productsData.meta);
       setCategories(categoriesData);
       setLoading(false);
     };
@@ -45,15 +48,21 @@ export default function HomePage() {
           search: deferredSearch,
           categoryId,
           minPrice: priceMin,
-          maxPrice: priceMax
+          maxPrice: priceMax,
+          page
         });
-        setProducts(productsData);
+        setProducts(productsData.data);
+        setMeta(productsData.meta);
       } finally {
         setLoading(false);
       }
     };
 
     void loadProducts();
+  }, [categoryId, deferredSearch, page, priceMax, priceMin]);
+
+  useEffect(() => {
+    setPage(1);
   }, [categoryId, deferredSearch, priceMax, priceMin]);
 
   const handleAddToCart = async (productId: string) => {
@@ -127,12 +136,19 @@ export default function HomePage() {
 
           <div className="mt-8 grid gap-4 md:grid-cols-4">
             <input
+              id="catalogue-search"
+              name="search"
+              type="search"
+              aria-label="Rechercher un produit"
               className="field md:col-span-2"
               placeholder="Rechercher un produit, une ambiance, une categorie..."
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />
             <select
+              id="catalogue-category"
+              name="categoryId"
+              aria-label="Filtrer par categorie"
               className="field"
               value={categoryId}
               onChange={(event) => setCategoryId(event.target.value)}
@@ -146,12 +162,22 @@ export default function HomePage() {
             </select>
             <div className="grid grid-cols-2 gap-3">
               <input
+                id="catalogue-price-min"
+                name="minPrice"
+                type="number"
+                min="0"
+                aria-label="Prix minimum en euros"
                 className="field"
                 placeholder="Min"
                 value={priceMin}
                 onChange={(event) => setPriceMin(event.target.value)}
               />
               <input
+                id="catalogue-price-max"
+                name="maxPrice"
+                type="number"
+                min="0"
+                aria-label="Prix maximum en euros"
                 className="field"
                 placeholder="Max"
                 value={priceMax}
@@ -161,7 +187,13 @@ export default function HomePage() {
           </div>
 
           {feedback ? (
-            <div className="mt-6 rounded-2xl bg-pine/10 px-4 py-3 text-sm text-pine">{feedback}</div>
+            <div
+              role="status"
+              aria-live="polite"
+              className="mt-6 rounded-2xl bg-pine/10 px-4 py-3 text-sm text-pine"
+            >
+              {feedback}
+            </div>
           ) : null}
 
           {loading ? (
@@ -177,6 +209,33 @@ export default function HomePage() {
               ))}
             </div>
           )}
+
+          {meta && meta.totalPages > 1 ? (
+            <nav
+              className="mt-10 flex items-center justify-center gap-4"
+              aria-label="Pagination du catalogue"
+            >
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={() => setPage((current) => Math.max(1, current - 1))}
+                disabled={meta.page <= 1 || loading}
+              >
+                Page precedente
+              </button>
+              <p aria-live="polite" className="text-sm text-ink/70">
+                Page {meta.page} sur {meta.totalPages} — {meta.total} produits
+              </p>
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={() => setPage((current) => Math.min(meta.totalPages, current + 1))}
+                disabled={meta.page >= meta.totalPages || loading}
+              >
+                Page suivante
+              </button>
+            </nav>
+          ) : null}
         </div>
       </section>
     </div>

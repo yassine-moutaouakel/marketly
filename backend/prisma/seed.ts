@@ -174,6 +174,136 @@ async function main() {
       categoryId: categories[2].id,
       images: ["https://images.unsplash.com/photo-1542291026-7eec264c27ff"],
       isFeatured: true
+    },
+    {
+      name: "Enceinte Portable Echo",
+      description: "Enceinte bluetooth compacte, autonomie 20 heures et resistance aux eclaboussures.",
+      sku: "ECHO-SPEAKER",
+      priceInCents: 6490,
+      stock: 30,
+      categoryId: categories[0].id,
+      images: ["https://images.unsplash.com/photo-1608043152269-423dbba4e7e1"],
+      isFeatured: false
+    },
+    {
+      name: "Clavier Mecanique Slate",
+      description: "Clavier mecanique compact retroeclaire avec switches lineaires silencieux.",
+      sku: "SLATE-KEYBOARD",
+      priceInCents: 11990,
+      stock: 12,
+      categoryId: categories[0].id,
+      images: ["https://images.unsplash.com/photo-1587829741301-dc798b83add3"],
+      isFeatured: false
+    },
+    {
+      name: "Chargeur Sans Fil Disc",
+      description: "Chargeur a induction 15W compatible avec la majorite des smartphones recents.",
+      sku: "DISC-CHARGER",
+      priceInCents: 2990,
+      stock: 45,
+      categoryId: categories[0].id,
+      images: ["https://images.unsplash.com/photo-1591290619762-b4b1d5c1b8b3"],
+      isFeatured: false
+    },
+    {
+      name: "Plaid Laine Douce",
+      description: "Plaid en laine melangee, tisse en France, ideal pour les soirees d hiver.",
+      sku: "PLAID-LAINE",
+      priceInCents: 4590,
+      stock: 22,
+      categoryId: categories[1].id,
+      images: ["https://images.unsplash.com/photo-1580301762395-83604a1c15b0"],
+      isFeatured: false
+    },
+    {
+      name: "Vase Ceramique Ondes",
+      description: "Vase artisanal en ceramique emaillee, piece unique tournee a la main.",
+      sku: "ONDES-VASE",
+      priceInCents: 3890,
+      stock: 16,
+      categoryId: categories[1].id,
+      images: ["https://images.unsplash.com/photo-1578500494198-246f612d3b3d"],
+      isFeatured: false
+    },
+    {
+      name: "Set Couverts Nordic",
+      description: "Set de couverts en inox brosse, seize pieces, finition mate.",
+      sku: "NORDIC-CUTLERY",
+      priceInCents: 5290,
+      stock: 20,
+      categoryId: categories[1].id,
+      images: ["https://images.unsplash.com/photo-1590794056226-79ef3a8147e1"],
+      isFeatured: false
+    },
+    {
+      name: "Miroir Rond Halo",
+      description: "Miroir mural rond avec cadre metal noir, diametre soixante centimetres.",
+      sku: "HALO-MIRROR",
+      priceInCents: 8900,
+      stock: 9,
+      categoryId: categories[1].id,
+      images: ["https://images.unsplash.com/photo-1618220179428-22790b461013"],
+      isFeatured: true
+    },
+    {
+      name: "Sneakers Urban Low",
+      description: "Baskets basses en cuir pleine fleur, semelle recyclee et doublure textile.",
+      sku: "URBAN-LOW",
+      priceInCents: 9900,
+      stock: 26,
+      categoryId: categories[2].id,
+      images: ["https://images.unsplash.com/photo-1549298916-b41d501d3772"],
+      isFeatured: false
+    },
+    {
+      name: "Montre Minimal Field",
+      description: "Montre analogique bracelet cuir, boitier acier trente-huit millimetres.",
+      sku: "FIELD-WATCH",
+      priceInCents: 14900,
+      stock: 8,
+      categoryId: categories[2].id,
+      images: ["https://images.unsplash.com/photo-1524592094714-0f0654e20314"],
+      isFeatured: true
+    },
+    {
+      name: "Echarpe Cachemire Brume",
+      description: "Echarpe en cachemire tisse, coloris brume, dimensions cent quatre-vingts centimetres.",
+      sku: "BRUME-SCARF",
+      priceInCents: 7900,
+      stock: 14,
+      categoryId: categories[2].id,
+      images: ["https://images.unsplash.com/photo-1601924994987-69e26d50dc26"],
+      isFeatured: false
+    },
+    {
+      name: "Sac Bandouliere Trace",
+      description: "Sac bandouliere compact en toile enduite, poche interieure zippee.",
+      sku: "TRACE-BAG",
+      priceInCents: 6200,
+      stock: 19,
+      categoryId: categories[2].id,
+      images: ["https://images.unsplash.com/photo-1548036328-c9fa89d128fa"],
+      isFeatured: false
+    },
+    {
+      name: "Carnet Cuir Atelier",
+      description: "Carnet a couverture cuir rechargeable, papier ivoire cent grammes.",
+      sku: "ATELIER-NOTEBOOK",
+      priceInCents: 3200,
+      stock: 40,
+      categoryId: categories[1].id,
+      images: ["https://images.unsplash.com/photo-1531346878377-a5be20888e57"],
+      isFeatured: false
+    },
+    {
+      name: "Gourde Isotherme Peak",
+      description: "Gourde isotherme cinq cents millilitres, acier double paroi, garde le chaud douze heures.",
+      sku: "PEAK-BOTTLE",
+      priceInCents: 2790,
+      stock: 50,
+      categoryId: categories[0].id,
+      images: ["https://images.unsplash.com/photo-1602143407151-7111542de6e8"],
+      isFeatured: false
     }
   ];
 

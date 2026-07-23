@@ -10,7 +10,9 @@ export const productQuerySchema = z.object({
     .union([z.literal("true"), z.literal("false")])
     .transform((value) => value === "true")
     .optional(),
-  status: z.enum(["DRAFT", "PUBLISHED", "SUSPENDED"]).optional()
+  status: z.enum(["DRAFT", "PUBLISHED", "SUSPENDED"]).optional(),
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().positive().max(50).default(12)
 });
 
 export const createProductSchema = z.object({

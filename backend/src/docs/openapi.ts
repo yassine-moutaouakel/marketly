@@ -163,10 +163,44 @@ export const openApiDocument = {
           { name: "search", in: "query", schema: { type: "string" } },
           { name: "categoryId", in: "query", schema: { type: "string" } },
           { name: "minPrice", in: "query", schema: { type: "number" } },
-          { name: "maxPrice", in: "query", schema: { type: "number" } }
+          { name: "maxPrice", in: "query", schema: { type: "number" } },
+          {
+            name: "page",
+            in: "query",
+            description: "Numero de page (defaut 1)",
+            schema: { type: "integer", minimum: 1, default: 1 }
+          },
+          {
+            name: "limit",
+            in: "query",
+            description: "Nombre de produits par page (max 50, defaut 12)",
+            schema: { type: "integer", minimum: 1, maximum: 50, default: 12 }
+          }
         ],
         responses: {
-          "200": { description: "Catalogue produits" }
+          "200": {
+            description: "Catalogue produits pagine (data + meta)",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    data: { type: "array", items: { type: "object" } },
+                    meta: {
+                      type: "object",
+                      properties: {
+                        page: { type: "integer", example: 1 },
+                        limit: { type: "integer", example: 12 },
+                        total: { type: "integer", example: 37 },
+                        totalPages: { type: "integer", example: 4 }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": { description: "Parametres de pagination invalides" }
         }
       },
       post: {

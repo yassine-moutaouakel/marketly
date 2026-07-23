@@ -110,13 +110,26 @@ export const productService = {
       where.isFeatured = query.featured;
     }
 
-    const products = await prisma.product.findMany({
-      where,
-      include: productInclude,
-      orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }]
-    });
+    const [products, total] = await Promise.all([
+      prisma.product.findMany({
+        where,
+        include: productInclude,
+        orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }],
+        skip: (query.page - 1) * query.limit,
+        take: query.limit
+      }),
+      prisma.product.count({ where })
+    ]);
 
-    return products.map(serializeProduct);
+    return {
+      items: products.map(serializeProduct),
+      meta: {
+        page: query.page,
+        limit: query.limit,
+        total,
+        totalPages: Math.max(1, Math.ceil(total / query.limit))
+      }
+    };
   },
 
   async listMine(userId: string) {

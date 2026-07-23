@@ -16,11 +16,38 @@ describe("Product routes", () => {
   it("lists published products", async () => {
     mockPrisma.product.findMany.mockResolvedValue([buildProduct()]);
 
+    mockPrisma.product.count.mockResolvedValue(1);
+
     const response = await request(app).get("/api/products");
 
     expect(response.status).toBe(200);
     expect(response.body.data).toHaveLength(1);
     expect(response.body.data[0].price).toBe(89.9);
+  });
+
+  it("paginates the catalogue and exposes pagination metadata", async () => {
+    mockPrisma.product.findMany.mockResolvedValue([buildProduct()]);
+    mockPrisma.product.count.mockResolvedValue(37);
+
+    const response = await request(app).get("/api/products?page=2&limit=12");
+
+    expect(response.status).toBe(200);
+    expect(response.body.meta).toEqual({
+      page: 2,
+      limit: 12,
+      total: 37,
+      totalPages: 4
+    });
+    expect(mockPrisma.product.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ skip: 12, take: 12 })
+    );
+  });
+
+  it("rejects an out-of-range pagination limit", async () => {
+    const response = await request(app).get("/api/products?limit=500");
+
+    expect(response.status).toBe(400);
+    expect(mockPrisma.product.findMany).not.toHaveBeenCalled();
   });
 
   it("blocks product creation for unauthenticated users", async () => {

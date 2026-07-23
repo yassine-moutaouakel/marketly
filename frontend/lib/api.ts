@@ -50,6 +50,40 @@ async function apiRequest<T>(path: string, init?: RequestInit, token?: string | 
   return payload.data as T;
 }
 
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+async function apiRequestWithMeta<T>(
+  path: string,
+  init?: RequestInit,
+  token?: string | null
+): Promise<{ data: T; meta?: PaginationMeta }> {
+  const response = await fetch(buildUrl(path), {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(init?.headers || {})
+    },
+    cache: "no-store"
+  });
+
+  const payload = (await response.json().catch(() => ({}))) as Partial<ApiResponse<T>> & {
+    message?: string;
+    meta?: PaginationMeta;
+  };
+
+  if (!response.ok) {
+    throw new Error(payload.message || "Request failed");
+  }
+
+  return { data: payload.data as T, meta: payload.meta };
+}
+
 export const api = {
   register: (body: Record<string, unknown>) =>
     apiRequest<AuthPayload>("/auth/register", {
@@ -66,7 +100,7 @@ export const api = {
   me: (token: string) => apiRequest<User>("/auth/me", undefined, token),
 
   getProducts: (params?: Record<string, string | number | boolean | undefined>) =>
-    apiRequest<Product[]>(`/products${params ? `?${new URLSearchParams(
+    apiRequestWithMeta<Product[]>(`/products${params ? `?${new URLSearchParams(
       Object.entries(params)
         .filter(([, value]) => value !== undefined && value !== "")
         .map(([key, value]) => [key, String(value)])
