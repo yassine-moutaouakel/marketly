@@ -15,4 +15,34 @@ const envSchema = z.object({
   RATE_LIMIT_MAX: z.coerce.number().default(100)
 });
 
-export const env = envSchema.parse(process.env);
+const parsedEnv = envSchema.parse(process.env);
+
+/**
+ * Production guard: the permissive defaults above exist to keep local
+ * development and the test suite frictionless. Shipping them to production
+ * would expose forgeable JWTs and a non-functional payment flow, so we fail
+ * fast at boot instead (OWASP A05 - Security Misconfiguration).
+ */
+if (parsedEnv.NODE_ENV === "production") {
+  const insecureDefaults: string[] = [];
+
+  if (parsedEnv.JWT_SECRET === "marketly-super-secret") {
+    insecureDefaults.push("JWT_SECRET");
+  }
+
+  if (parsedEnv.STRIPE_SECRET_KEY === "sk_test_change_me") {
+    insecureDefaults.push("STRIPE_SECRET_KEY");
+  }
+
+  if (parsedEnv.STRIPE_WEBHOOK_SECRET === "whsec_change_me") {
+    insecureDefaults.push("STRIPE_WEBHOOK_SECRET");
+  }
+
+  if (insecureDefaults.length > 0) {
+    throw new Error(
+      `Refusing to start in production with default values for: ${insecureDefaults.join(", ")}`
+    );
+  }
+}
+
+export const env = parsedEnv;
