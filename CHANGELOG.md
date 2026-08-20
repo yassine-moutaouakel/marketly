@@ -4,6 +4,38 @@ Toutes les evolutions notables du projet Marketly sont consignees dans ce fichie
 Le format suit les principes de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/)
 et le projet applique le [versionnage semantique](https://semver.org/lang/fr/).
 
+## [1.2.0] - 2026-08-20
+
+### Disponibilite et supervision
+
+- Ajout de deux sondes HTTP dediees a la supervision : `GET /health`
+  (liveness, confirme que le processus repond) et `GET /health/ready`
+  (readiness, verifie la connectivite PostgreSQL via `SELECT 1` et sa
+  latence, renvoie `503` en cas de degradation).
+- Le serveur ne plante plus si la base de donnees est injoignable au
+  demarrage : la connexion Prisma est desormais tentee en arriere-plan
+  plutot que bloquante dans `app.listen`, ce qui evite un crash-loop et
+  permet a `/health/ready` de refleter fidelement l'etat degrade.
+- Ajout d'**Uptime Kuma** comme quatrieme service du `docker-compose.yml` :
+  sonde `/health/ready` et `/` a intervalle regulier, historique de
+  disponibilite et notifications configurables.
+
+### Maintenance et dependances
+
+- Configuration de **Dependabot** (`.github/dependabot.yml`) : detection
+  hebdomadaire des dependances npm (backend et frontend) et mensuelle des
+  actions GitHub, mises a jour patch/mineures de production groupees,
+  majeures isolees par pull request individuelle. La fusion reste
+  manuelle et conditionnee au succes du pipeline CI.
+- Documentation des processus de maintien en condition operationnelle
+  dans `docs/maintenance.md` (mise a jour des dependances, supervision,
+  consignation des anomalies, recommandations d'amelioration).
+
+### Qualite
+
+- Harnais de tests porte de 37 a 40 tests : ajout de `health.test.ts`
+  couvrant la liveness, la readiness saine et la readiness degradee.
+
 ## [1.1.1] - 2026-07-24
 
 ### Corrections
