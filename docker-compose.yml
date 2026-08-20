@@ -34,6 +34,18 @@ services:
     ports:
       - "4000:4000"
 
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: marketly-uptime-kuma
+    restart: unless-stopped
+    depends_on:
+      - backend
+      - frontend
+    ports:
+      - "3001:3001"
+    volumes:
+      - marketly-uptime-kuma-data:/app/data
+
   frontend:
     build:
       context: ./frontend
@@ -47,4 +59,5 @@ services:
       - "3000:3000"
 
 volumes:
+  marketly-uptime-kuma-data:
   marketly-postgres-data:
