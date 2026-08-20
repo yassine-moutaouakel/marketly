@@ -4,6 +4,7 @@ export const mockPrisma = {
   $connect: createMockFunction(),
   $disconnect: createMockFunction(),
   $transaction: createMockFunction(),
+  $queryRaw: createMockFunction(),
   user: {
     findUnique: createMockFunction(),
     create: createMockFunction(),

@@ -8,6 +8,7 @@ import { env } from "./config/env";
 import { paymentController } from "./controllers/payment.controller";
 import { openApiDocument } from "./docs/openapi";
 import { asyncHandler } from "./lib/async-handler";
+import { buildReadinessReport } from "./lib/health";
 import { errorHandler } from "./middlewares/error-handler";
 import routes from "./routes";
 
@@ -40,6 +41,14 @@ app.get("/health", (_req, res) =>
   res.status(200).json({
     status: "ok",
     service: "marketly-backend"
+  })
+);
+
+app.get(
+  "/health/ready",
+  asyncHandler(async (_req, res) => {
+    const report = await buildReadinessReport();
+    res.status(report.status === "ok" ? 200 : 503).json(report);
   })
 );
 
